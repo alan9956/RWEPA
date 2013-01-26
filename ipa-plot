@@ -1,0 +1,50 @@
+# title: IPA plot
+# date: 2013.1.25
+
+fn = "vowdat.txt"
+vn = c("1", "3", "6", "8", "10", "12")
+plot_colors = c("red", "orange", "darkviolet", "blue", "limegreen", "deeppink", "black","pink")
+prob = 0.90
+dots = FALSE
+foundpack = F
+
+tryload = try(library(car),T)
+if (is.element("car",tryload)) {
+  foundpack = T
+}
+
+if (!foundpack) {
+  install.packages("car", dependencies = T)
+  library(car)
+}
+
+vowdat = read.table(fn,T)
+attach(vowdat)
+numv = length(vn)
+factor(vn)
+vn.df <- data.frame(vn, ipa=names(table(Vowel)))
+vn.df
+if (dots) {
+  dataEllipse(F1[Vowel==vn.df[1,2]], F2[Vowel==vn.df[1,2]], levels=prob, col=plot_colors[1], lty=1, xlim=c(min(F1)-800,max(F1)+900),ylim=c(min(F2)-1000,max(F2)+600), xlab = "F1 (Hz)", ylab = "F2 (Hz)")
+  }
+
+if (!dots) {
+  plot(F1[Vowel==vn.df[1,2]], F2[Vowel==vn.df[1,2]],col="white", xlim=c(min(F1)-900,max(F1)+900),ylim=c(min(F2)-1000,max(F2)+600), xlab = "F1 (Hz)", ylab = "F2 (Hz)")
+  dataEllipse(F1[Vowel==vn.df[1,2]], F2[Vowel==vn.df[1,2]], levels=prob, col=plot_colors[1], lty=1, add=T, plot.points=F)
+  }
+
+for (i in 2:numv) {
+  if (dots) {
+    dataEllipse(F1[Vowel==vn.df[i,2]], F2[Vowel==vn.df[i,2]], levels=prob, add=T, col=plot_colors[i], lty=i, pch=i, center.pch=i)
+    }
+
+ if (!dots) {
+   dataEllipse(F1[Vowel==vn.df[i,2]], F2[Vowel==vn.df[i,2]], levels=prob, add=T, col=plot_colors[i], plot.points=F, lty=i, pch=i, center.pch=i)
+   }
+  }
+
+par(lwd=1)
+par(lty=1)
+legend("bottomright",lwd=c(rep(2,numv)),lty=(1:numv),pch=(1:numv),legend=vn.df$ipa,bg="white", col=plot_colors)
+detach(vowdat)
+# end
